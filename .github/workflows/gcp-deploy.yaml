@@ -1,0 +1,42 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Google Cloud CLI
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        version: 'latest'
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    - name: Configure Docker authentication
+      run: |-
+        gcloud auth configure-docker us-central1-docker.pkg.dev
+
+    - name: Build and push Docker image to GCR
+      run: |-
+        IMAGE_NAME="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo/my-python-app"
+        docker build -t $IMAGE_NAME:latest .
+        docker push $IMAGE_NAME:latest
+
+    - name: Deploy to Cloud Run
+      run: |-
+        IMAGE_NAME="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo/my-python-app"
+        gcloud run deploy my-python-app \
+          --image $IMAGE_NAME:latest \
+          --region us-central1 \
+          --platform managed \
+          --allow-unauthenticated
