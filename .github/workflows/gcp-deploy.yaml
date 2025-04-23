@@ -44,6 +44,13 @@ jobs:
         export GCLOUD_SDK_PATH=$(gcloud info --format="value(installation.sdk_root)")
         export PATH="$GCLOUD_SDK_PATH/bin:$PATH"
         echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+
+    - name: Manually install gke-gcloud-auth-plugin
+      run: |
+        curl -LO https://dl.google.com/dl/cloudsdk/channels/rapid/components/google-cloud-sdk-gke-gcloud-auth-plugin-linux-x86_64.tar.gz
+        tar -xzf google-cloud-sdk-gke-gcloud-auth-plugin-linux-x86_64.tar.gz
+        sudo mv google-cloud-sdk-gke-gcloud-auth-plugin/bin/gke-gcloud-auth-plugin /usr/local/bin/
+
         
     - name: Get GKE credentials
       run: |
