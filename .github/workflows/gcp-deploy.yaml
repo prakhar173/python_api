@@ -25,7 +25,8 @@ jobs:
       with:
         version: 'latest'
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-  
+        install_components: 'kubectl'  
+        
     - name: Configure Docker authentication
       run: |-
         gcloud auth configure-docker us-central1-docker.pkg.dev
@@ -45,11 +46,10 @@ jobs:
         export PATH="$GCLOUD_SDK_PATH/bin:$PATH"
         echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
 
-    - name: Manually install gke-gcloud-auth-plugin
+    - name: Install gke-gcloud-auth-plugin
       run: |
-        curl -LO https://dl.google.com/dl/cloudsdk/channels/rapid/components/google-cloud-sdk-gke-gcloud-auth-plugin-linux-x86_64.tar.gz
-        tar -xzf google-cloud-sdk-gke-gcloud-auth-plugin-linux-x86_64.tar.gz
-        sudo mv google-cloud-sdk-gke-gcloud-auth-plugin/bin/gke-gcloud-auth-plugin /usr/local/bin/
+        gcloud components install gke-gcloud-auth-plugin --quiet
+        echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
 
         
     - name: Get GKE credentials
