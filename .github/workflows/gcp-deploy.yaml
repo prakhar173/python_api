@@ -36,10 +36,8 @@ jobs:
         docker build -t $IMAGE_NAME:latest .
         docker push $IMAGE_NAME:latest
 
-    - name: Install gke-gcloud-auth-plugin
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin        
+    - name: Enable GKE auth plugin usage
+      run: echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV     
 
     - name: Get GKE credentials
       run: |
