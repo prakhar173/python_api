@@ -36,11 +36,13 @@ jobs:
         docker build -t $IMAGE_NAME:latest .
         docker push $IMAGE_NAME:latest
 
-    - name: Deploy to Cloud Run
-      run: |-
-        IMAGE_NAME="us-central1-docker.pkg.dev/dev-order-453010-h4/my-docker/my-python-app"
-        gcloud run deploy my-python-app \
-          --image $IMAGE_NAME:latest \
+    - name: Get GKE credentials
+      run: |
+        gcloud container clusters get-credentials prod-cluster \
           --region us-central1 \
-          --platform managed \
-          --allow-unauthenticated
+          --project ${{ secrets.GCP_PROJECT_ID }}
+
+    - name: Deploy to GKE with kubectl
+      run: |
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
