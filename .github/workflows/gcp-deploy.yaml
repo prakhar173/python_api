@@ -39,6 +39,12 @@ jobs:
     - name: Enable GKE auth plugin usage
       run: echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV     
 
+    - name: Make gke-gcloud-auth-plugin available
+      run: |
+        export GCLOUD_SDK_PATH=$(gcloud info --format="value(installation.sdk_root)")
+        export PATH="$GCLOUD_SDK_PATH/bin:$PATH"
+        echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+        
     - name: Get GKE credentials
       run: |
         gcloud container clusters get-credentials prod-cluster \
